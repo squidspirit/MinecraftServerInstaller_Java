@@ -20,7 +20,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MainController">
    <children>
       <TabPane prefHeight="580.0" prefWidth="400.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
@@ -53,9 +53,9 @@
                           </rowConstraints>
                            <children>
                               <Label text="遊戲版本" />
-                              <TextField prefHeight="24.0" prefWidth="183.0" GridPane.columnIndex="1" />
-                              <Button mnemonicParsing="false" prefHeight="24.0" prefWidth="76.0" text="選擇" GridPane.columnIndex="2" />
-                              <TextField GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <TextField fx:id="gameVersionTextField" prefHeight="24.0" prefWidth="183.0" GridPane.columnIndex="1" />
+                              <Button fx:id="gameVersionButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="76.0" text="選擇" GridPane.columnIndex="2" />
+                              <TextField fx:id="installLocatinTextField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                               <Label text="模組版本" GridPane.rowIndex="1" />
                               <GridPane prefWidth="174.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                 <columnConstraints>
@@ -66,29 +66,34 @@
                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                 </rowConstraints>
                                  <children>
-                                    <TextField prefHeight="24.0" prefWidth="100.0" GridPane.columnIndex="1" />
-                                    <ChoiceBox prefWidth="150.0" />
+                                    <TextField fx:id="modVersionTextField" prefHeight="24.0" prefWidth="100.0" GridPane.columnIndex="1" />
+                                    <ChoiceBox fx:id="modVersionChoiceBox" prefWidth="150.0" />
                                  </children>
                               </GridPane>
-                              <Button mnemonicParsing="false" prefHeight="24.0" prefWidth="76.0" text="選擇" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                              <Button fx:id="modVersionButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="76.0" text="選擇" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                               <Label text="安裝位置" GridPane.rowIndex="2" />
-                              <Button mnemonicParsing="false" prefHeight="24.0" prefWidth="76.0" text="瀏覽" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                              <Label text="最大記憶體" GridPane.rowIndex="3" />
-                              <Spinner editable="true" prefHeight="24.0" prefWidth="76.0" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                              <Slider blockIncrement="1.0" max="10240.0" min="128.0" value="1024.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                              <Label text="最大記憶體" GridPane.rowIndex="4" />
-                              <Slider blockIncrement="1.0" max="10240.0" min="128.0" value="1024.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                              <Spinner editable="true" prefHeight="24.0" prefWidth="76.0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-                              <Label text="GUI 介面" GridPane.rowIndex="5" />
-                              <CheckBox mnemonicParsing="false" text="啟用伺服器 GUI 介面" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                              <Label text="EULA" GridPane.rowIndex="6" />
-                              <CheckBox mnemonicParsing="false" text="我同意 EULA 條款" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                              <Button mnemonicParsing="false" prefHeight="40.0" prefWidth="76.0" text="開始安裝" GridPane.columnIndex="2" GridPane.rowIndex="11" />
+                              <Button fx:id="installLocationButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="76.0" text="瀏覽" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                              <Label text="最大記憶體" GridPane.rowIndex="7" />
+                              <Spinner fx:id="maxRamSpinner" editable="true" prefHeight="24.0" prefWidth="76.0" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+                              <Slider fx:id="maxRamSlider" blockIncrement="1.0" max="10240.0" min="128.0" value="1024.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                              <Label text="最小記憶體" GridPane.rowIndex="8" />
+                              <Slider fx:id="minRamSlider" blockIncrement="1.0" max="10240.0" min="128.0" value="1024.0" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                              <Spinner fx:id="minRamSpinner" editable="true" prefHeight="24.0" prefWidth="76.0" GridPane.columnIndex="2" GridPane.rowIndex="8" />
+                              <Label text="GUI 介面" GridPane.rowIndex="3" />
+                              <CheckBox fx:id="guiCheckBox" mnemonicParsing="false" text="啟用伺服器 GUI 介面" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              <Label text="EULA" GridPane.rowIndex="4" />
+                              <CheckBox fx:id="eulaCheckBox" mnemonicParsing="false" text="我同意 EULA 條款" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                              <Button fx:id="startInstallButton" mnemonicParsing="false" prefHeight="40.0" prefWidth="76.0" text="開始安裝" GridPane.columnIndex="2" GridPane.rowIndex="11" />
                               <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="11">
                                  <children>
-                                    <Button layoutX="81.0" layoutY="10.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="105.0" text="記憶體重置" />
+                                    <Button fx:id="ramResetButton" layoutX="81.0" layoutY="10.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="105.0" text="重置記憶體設定">
+                                       <font>
+                                          <Font size="12.5" />
+                                       </font></Button>
                                  </children>
                               </AnchorPane>
+                              <Label text="記憶體選項" GridPane.rowIndex="6" />
+                              <CheckBox fx:id="changeRamCheckBox" mnemonicParsing="false" text="更改伺服器記憶體限制" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                            </children>
                         </GridPane>
                      </children>
@@ -182,33 +187,17 @@
                                     <Label text="最大視野距離" />
                                  </children>
                               </VBox>
-                              <GridPane GridPane.columnIndex="1" GridPane.rowIndex="11">
-                                <columnConstraints>
-                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="138.0" minWidth="10.0" prefWidth="130.0" />
-                                  <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="102.0" minWidth="10.0" prefWidth="80.0" />
-                                </columnConstraints>
-                                <rowConstraints>
-                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                </rowConstraints>
-                                 <children>
-                                    <Button mnemonicParsing="false" prefHeight="40.0" prefWidth="76.0" text="開始安裝" GridPane.columnIndex="1" />
-                                    <AnchorPane prefHeight="200.0" prefWidth="200.0">
-                                       <children>
-                                          <Button layoutX="20.0" layoutY="10.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="105.0" text="重置進階選項" />
-                                       </children>
-                                    </AnchorPane>
-                                 </children>
-                              </GridPane>
-                              <Spinner prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" />
-                              <Spinner prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                              <Spinner prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                              <Spinner prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                              <ChoiceBox prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                              <ChoiceBox prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                              <ChoiceBox prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                              <ChoiceBox prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-                              <ChoiceBox prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-                              <TextField maxHeight="24.0" maxWidth="200.0" minHeight="24.0" minWidth="200.0" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+                              <Spinner fx:id="portSpinner" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" />
+                              <Spinner fx:id="maxPlayerSpinner" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <Spinner fx:id="viewDistanceSpinner" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              <Spinner fx:id="spawnProtectionSpinner" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <ChoiceBox fx:id="pvpChoiceBox" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                              <ChoiceBox fx:id="gamemodeChoiceBox" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                              <ChoiceBox fx:id="difficultyChoiceBox" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                              <ChoiceBox fx:id="commandBolckChoiceBox" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                              <ChoiceBox fx:id="onlineModeChoiceBox" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                              <TextField fx:id="motdTextField" maxHeight="24.0" maxWidth="200.0" minHeight="24.0" minWidth="200.0" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+                              <Button fx:id="optionResetButton" mnemonicParsing="false" prefHeight="40.0" prefWidth="76.0" text="重置選項" GridPane.columnIndex="1" GridPane.rowIndex="11" />
                            </children>
                         </GridPane>
                      </children>
@@ -252,7 +241,7 @@
                                  </rowConstraints>
                                  <children>
                                     <AnchorPane prefHeight="200.0" prefWidth="200.0" />
-                                    <Button mnemonicParsing="false" prefHeight="40.0" prefWidth="76.0" text="檢查更新" GridPane.columnIndex="1" />
+                                    <Button fx:id="checkNewButton" mnemonicParsing="false" prefHeight="40.0" prefWidth="76.0" text="檢查更新" GridPane.columnIndex="1" />
                                  </children>
                               </GridPane>
                               <Label text="軟體名稱" />
@@ -261,12 +250,12 @@
                               <Label text="問題回報" GridPane.rowIndex="3" />
                               <Label text="使用教學" GridPane.rowIndex="4" />
                               <Label text="難疑排解" GridPane.rowIndex="5" />
-                              <Label text="Program" GridPane.columnIndex="1" />
-                              <Label text="Version" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                              <Label text="Realease" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                              <Label text="Email" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                              <Label text="Tutorial" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                              <Label text="Problem" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                              <Label fx:id="nameLabel" text="Program" GridPane.columnIndex="1" />
+                              <Label fx:id="versionLabel" text="Version" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <Label fx:id="authorLabel" text="Realease" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <TextField fx:id="emailTextField" text="Email" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              <TextField fx:id="tutorialTextField" text="Tutorial" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                              <TextField fx:id="websiteTextField" text="Problems" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                            </children>
                         </GridPane>
                      </children>
@@ -277,8 +266,8 @@
       <Separator prefWidth="200.0" />
       <HBox alignment="CENTER_RIGHT" prefHeight="60.0" prefWidth="400.0" spacing="15.0">
          <children>
-            <ProgressBar prefHeight="17.0" prefWidth="105.0" progress="0.0" />
-            <Label text="狀態：已就緒" textAlignment="RIGHT">
+            <ProgressBar fx:id="progressBar" prefHeight="17.0" prefWidth="105.0" progress="0.0" />
+            <Label fx:id="statusLabel" text="狀態：已就緒" textAlignment="RIGHT">
                <font>
                   <Font size="12.0" />
                </font>
