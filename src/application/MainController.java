@@ -137,4 +137,52 @@ public class MainController {
     public void onResetRamButton(ActionEvent event) {
         resetRamOptions();
     }
+
+    public void onMaxRamSlider() {
+        int newVal = (int)maxRamSlider.getValue();
+        int minVal = (int)minRamSlider.getValue();
+        if (newVal >= minVal) {
+            maxRamTextField.setText(String.valueOf(newVal));
+            return;
+        }
+        MessageBox.alertBox(AlertType.INFORMATION, changeRamCheckBox.getText(), "最大記憶體限制必須大於最小限制。");
+        maxRamSlider.setValue(minVal);
+        maxRamTextField.setText(String.valueOf(minVal));
+    }
+
+    public void onMaxRamTextField(ActionEvent event) {
+        int newVal = Integer.parseInt(maxRamTextField.getText());
+        int minVal = (int)minRamSlider.getValue();
+        if (newVal >= minVal) {
+            maxRamSlider.setValue(newVal);
+            return;
+        }
+        MessageBox.alertBox(AlertType.INFORMATION, changeRamCheckBox.getText(), "最大記憶體限制必須大於最小限制。");
+        maxRamSlider.setValue(minVal);
+        maxRamTextField.setText(String.valueOf(minVal));
+    }
+
+    public void onMinRamSlider() {
+        int newVal = (int)minRamSlider.getValue();
+        int maxVal = (int)maxRamSlider.getValue();
+        if (newVal <= maxVal) {
+            minRamTextField.setText(String.valueOf(newVal));
+            return;
+        }
+        MessageBox.alertBox(AlertType.INFORMATION, changeRamCheckBox.getText(), "最大記憶體限制必須大於最小限制。");
+        minRamSlider.setValue(maxVal);
+        minRamTextField.setText(String.valueOf(maxVal));
+    }
+
+    public void onMinRamTextField(ActionEvent event) {
+        int newVal = Integer.parseInt(minRamTextField.getText());
+        int maxVal = (int)maxRamSlider.getValue();
+        if (newVal <= maxVal) {
+            minRamSlider.setValue(newVal);
+            return;
+        }
+        MessageBox.alertBox(AlertType.INFORMATION, changeRamCheckBox.getText(), "最大記憶體限制必須大於最小限制。");
+        minRamSlider.setValue(maxVal);
+        minRamTextField.setText(String.valueOf(maxVal));
+    }
 }

@@ -73,9 +73,9 @@
                               <Label text="安裝位置" GridPane.rowIndex="2" />
                               <Button fx:id="installLocationButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="76.0" text="瀏覽" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                               <Label text="最大記憶體" GridPane.rowIndex="7" />
-                              <Slider fx:id="maxRamSlider" blockIncrement="1.0" max="10240.0" min="128.0" value="1024.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                              <Slider fx:id="maxRamSlider" blockIncrement="1.0" max="10240.0" min="128.0" onMouseDragged="#onMaxRamSlider" onMouseReleased="#onMaxRamSlider" value="1024.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                               <Label text="最小記憶體" GridPane.rowIndex="8" />
-                              <Slider fx:id="minRamSlider" blockIncrement="1.0" max="10240.0" min="128.0" value="1024.0" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                              <Slider fx:id="minRamSlider" blockIncrement="1.0" max="10240.0" min="128.0" onMouseDragged="#onMinRamSlider" onMouseReleased="#onMinRamSlider" value="1024.0" GridPane.columnIndex="1" GridPane.rowIndex="8" />
                               <Label text="GUI 介面" GridPane.rowIndex="3" />
                               <CheckBox fx:id="guiCheckBox" mnemonicParsing="false" text="啟用伺服器 GUI 介面" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                               <Label text="EULA" GridPane.rowIndex="4" />
@@ -91,8 +91,8 @@
                               </AnchorPane>
                               <Label text="記憶體選項" GridPane.rowIndex="6" />
                               <CheckBox fx:id="changeRamCheckBox" mnemonicParsing="false" onAction="#onChangeRamCheckBox" text="更改伺服器記憶體限制" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                              <TextField fx:id="maxRamTextField" GridPane.columnIndex="2" GridPane.rowIndex="7" />
-                              <TextField fx:id="minRamTextField" GridPane.columnIndex="2" GridPane.rowIndex="8" />
+                              <TextField fx:id="maxRamTextField" onAction="#onMaxRamTextField" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+                              <TextField fx:id="minRamTextField" onAction="#onMinRamTextField" GridPane.columnIndex="2" GridPane.rowIndex="8" />
                            </children>
                         </GridPane>
                      </children>
