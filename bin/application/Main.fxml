@@ -8,7 +8,6 @@
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Slider?>
-<?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextField?>
@@ -74,11 +73,9 @@
                               <Label text="安裝位置" GridPane.rowIndex="2" />
                               <Button fx:id="installLocationButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="76.0" text="瀏覽" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                               <Label text="最大記憶體" GridPane.rowIndex="7" />
-                              <Spinner fx:id="maxRamSpinner" editable="true" prefHeight="24.0" prefWidth="76.0" GridPane.columnIndex="2" GridPane.rowIndex="7" />
                               <Slider fx:id="maxRamSlider" blockIncrement="1.0" max="10240.0" min="128.0" value="1024.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                               <Label text="最小記憶體" GridPane.rowIndex="8" />
                               <Slider fx:id="minRamSlider" blockIncrement="1.0" max="10240.0" min="128.0" value="1024.0" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-                              <Spinner fx:id="minRamSpinner" editable="true" prefHeight="24.0" prefWidth="76.0" GridPane.columnIndex="2" GridPane.rowIndex="8" />
                               <Label text="GUI 介面" GridPane.rowIndex="3" />
                               <CheckBox fx:id="guiCheckBox" mnemonicParsing="false" text="啟用伺服器 GUI 介面" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                               <Label text="EULA" GridPane.rowIndex="4" />
@@ -86,14 +83,16 @@
                               <Button fx:id="startInstallButton" mnemonicParsing="false" prefHeight="40.0" prefWidth="76.0" text="開始安裝" GridPane.columnIndex="2" GridPane.rowIndex="11" />
                               <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="11">
                                  <children>
-                                    <Button fx:id="ramResetButton" layoutX="81.0" layoutY="10.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="105.0" text="重置記憶體設定">
+                                    <Button fx:id="ramResetButton" layoutX="81.0" layoutY="10.0" mnemonicParsing="false" onAction="#onResetRamButton" prefHeight="40.0" prefWidth="105.0" text="重置記憶體設定">
                                        <font>
                                           <Font size="12.5" />
                                        </font></Button>
                                  </children>
                               </AnchorPane>
                               <Label text="記憶體選項" GridPane.rowIndex="6" />
-                              <CheckBox fx:id="changeRamCheckBox" mnemonicParsing="false" text="更改伺服器記憶體限制" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                              <CheckBox fx:id="changeRamCheckBox" mnemonicParsing="false" onAction="#onChangeRamCheckBox" text="更改伺服器記憶體限制" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                              <TextField fx:id="maxRamTextField" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+                              <TextField fx:id="minRamTextField" GridPane.columnIndex="2" GridPane.rowIndex="8" />
                            </children>
                         </GridPane>
                      </children>
@@ -187,10 +186,6 @@
                                     <Label text="最大視野距離" />
                                  </children>
                               </VBox>
-                              <Spinner fx:id="portSpinner" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" />
-                              <Spinner fx:id="maxPlayerSpinner" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                              <Spinner fx:id="viewDistanceSpinner" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                              <Spinner fx:id="spawnProtectionSpinner" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                               <ChoiceBox fx:id="pvpChoiceBox" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                               <ChoiceBox fx:id="gamemodeChoiceBox" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                               <ChoiceBox fx:id="difficultyChoiceBox" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
@@ -198,6 +193,10 @@
                               <ChoiceBox fx:id="onlineModeChoiceBox" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="8" />
                               <TextField fx:id="motdTextField" maxHeight="24.0" maxWidth="200.0" minHeight="24.0" minWidth="200.0" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="9" />
                               <Button fx:id="optionResetButton" mnemonicParsing="false" prefHeight="40.0" prefWidth="76.0" text="重置選項" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+                              <TextField fx:id="portTextField" maxHeight="24.0" maxWidth="200.0" minHeight="24.0" minWidth="200.0" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" />
+                              <TextField fx:id="maxPlayerTextField" maxHeight="24.0" maxWidth="200.0" minHeight="24.0" minWidth="200.0" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <TextField fx:id="spawnProtectionTextField" maxHeight="24.0" maxWidth="200.0" minHeight="24.0" minWidth="200.0" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <TextField fx:id="viewDistanceTextField" maxHeight="24.0" maxWidth="200.0" minHeight="24.0" minWidth="200.0" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                            </children>
                         </GridPane>
                      </children>

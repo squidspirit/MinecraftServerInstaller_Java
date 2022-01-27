@@ -6,12 +6,13 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
 public class MainController {
+
     /** Public Items */
     @FXML private Button startInstallButton;
     @FXML private Button ramResetButton;
@@ -30,17 +31,17 @@ public class MainController {
     @FXML private Button installLocationButton;
     @FXML private CheckBox changeRamCheckBox;
     @FXML private Slider maxRamSlider;
-    @FXML private Spinner<Integer> maxRamSpinner;
+    @FXML private TextField maxRamTextField = new TextField();
     @FXML private Slider minRamSlider;
-    @FXML private Spinner<Integer> minRamSpinner;
+    @FXML private TextField minRamTextField = new TextField();
     @FXML private CheckBox guiCheckBox;
     @FXML private CheckBox eulaCheckBox;
 
     /** Advance Options */
-    @FXML private Spinner<Integer> portSpinner;
-    @FXML private Spinner<Integer> maxPlayerSpinner;
-    @FXML private Spinner<Integer> spawnProtectionSpinner;
-    @FXML private Spinner<Integer> viewDistanceSpinner;
+    @FXML private TextField portTextField = new TextField();
+    @FXML private TextField maxPlayerTextField = new TextField();
+    @FXML private TextField spawnProtectionTextField = new TextField();
+    @FXML private TextField viewDistanceTextField = new TextField();
     @FXML private ChoiceBox<String> pvpChoiceBox;
     @FXML private ChoiceBox<String> gamemodeChoiceBox;
     @FXML private ChoiceBox<String> difficultyChoiceBox;
@@ -56,46 +57,31 @@ public class MainController {
     @FXML private TextField tutorialTextField = new TextField();
     @FXML private TextField websiteTextField = new TextField();
 
+    /** Initialize and Reset */
     @FXML
     public void initialize() {
         /** Basic Options */
         gameVersionTextField.setEditable(false);
-        modVersionChoiceBox.getItems().clear();
-        modVersionChoiceBox.getItems().addAll("不使用", "Forge", "Fabric");
         modVersionChoiceBox.getSelectionModel().selectFirst();
         modVersionTextField.setEditable(false);
         modVersionButton.setDisable(true);
         installLocatinTextField.setEditable(false);
-        maxRamSlider.setValue(1024);
-        maxRamSlider.setDisable(true);
-        maxRamSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(128, 10240, 1024, 128));
-        maxRamSpinner.setDisable(true);
-        minRamSlider.setValue(1024);
-        minRamSlider.setDisable(true);
-        minRamSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(128, 10240, 1024, 128));
-        minRamSpinner.setDisable(true);
-        ramResetButton.setDisable(true);
+        modVersionChoiceBox.getItems().clear();
+        modVersionChoiceBox.getItems().addAll("不使用", "Forge", "Fabric");
+        resetRamOptions();
 
-        /** Advance Options */
-        portSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(10000, 65535, 25565, 1));
-        maxPlayerSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 100, 20, 1));
-        spawnProtectionSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 128, 16, 1));
-        viewDistanceSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(2, 32, 10, 1));
+        /** Advanced Options */
         pvpChoiceBox.getItems().clear();
         pvpChoiceBox.getItems().addAll("true", "false");
-        pvpChoiceBox.getSelectionModel().selectFirst();
         gamemodeChoiceBox.getItems().clear();
         gamemodeChoiceBox.getItems().addAll("survival", "creative", "adventure", "spectator");
-        gamemodeChoiceBox.getSelectionModel().selectFirst();
         difficultyChoiceBox.getItems().clear();
         difficultyChoiceBox.getItems().addAll("peaceful", "easy", "normal", "hard");
-        difficultyChoiceBox.getSelectionModel().select(2);
         commandBolckChoiceBox.getItems().clear();
         commandBolckChoiceBox.getItems().addAll("true", "false");
-        commandBolckChoiceBox.getSelectionModel().selectLast();
         onlineModeChoiceBox.getItems().clear();
         onlineModeChoiceBox.getItems().addAll("true", "false");
-        onlineModeChoiceBox.getSelectionModel().selectFirst();
+        resetAdnavcedOptions();
 
         /** Information */
         nameLabel.setText(Information.Name);
@@ -107,5 +93,48 @@ public class MainController {
         tutorialTextField.setEditable(false);
         websiteTextField.setText(Information.Website);
         websiteTextField.setEditable(false);
+    }
+
+    public void resetRamOptions() {
+        changeRamCheckBox.setDisable(false);
+        changeRamCheckBox.setSelected(false);
+        maxRamSlider.setValue(1024);
+        maxRamSlider.setDisable(true);
+        maxRamTextField.setText("1024");
+        maxRamTextField.setDisable(true);
+        minRamSlider.setValue(1024);
+        minRamSlider.setDisable(true);
+        minRamTextField.setText("1024");
+        minRamTextField.setDisable(true);
+        ramResetButton.setDisable(true);
+    }
+
+    public void resetAdnavcedOptions() {
+        portTextField.setText("25565");
+        maxPlayerTextField.setText("20");
+        spawnProtectionTextField.setText("16");
+        viewDistanceTextField.setText("10");
+        pvpChoiceBox.getSelectionModel().selectFirst();
+        gamemodeChoiceBox.getSelectionModel().selectFirst();
+        difficultyChoiceBox.getSelectionModel().select(2);
+        commandBolckChoiceBox.getSelectionModel().selectLast();
+        onlineModeChoiceBox.getSelectionModel().selectFirst();
+    }
+
+    /** Actions */
+    public void onChangeRamCheckBox(ActionEvent event) {
+        if (changeRamCheckBox.isSelected()) {
+            MessageBox.alertBox(AlertType.INFORMATION, changeRamCheckBox.getText(), "更改伺服器記憶體限制可能會影響伺服器的穩定性，或甚至無法正常啟動，請小心調整。");
+            maxRamSlider.setDisable(false);
+            maxRamTextField.setDisable(false);
+            minRamSlider.setDisable(false);
+            minRamTextField.setDisable(false);
+            changeRamCheckBox.setDisable(true);
+            ramResetButton.setDisable(false);
+        }
+    }
+
+    public void onResetRamButton(ActionEvent event) {
+        resetRamOptions();
     }
 }
