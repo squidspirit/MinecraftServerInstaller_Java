@@ -84,14 +84,14 @@ public class MainController {
         resetAdnavcedOptions();
 
         /** Information */
-        nameLabel.setText(Information.Name);
-        versionLabel.setText(Information.Version);
-        authorLabel.setText(Information.Author);
-        emailTextField.setText(Information.Email);
+        nameLabel.setText(Information.NAME);
+        versionLabel.setText(Information.VERSION);
+        authorLabel.setText(Information.AUTHOR);
+        emailTextField.setText(Information.EMAIL);
         emailTextField.setEditable(false);
-        tutorialTextField.setText(Information.Tutorial);
+        tutorialTextField.setText(Information.TUTORIAL);
         tutorialTextField.setEditable(false);
-        websiteTextField.setText(Information.Website);
+        websiteTextField.setText(Information.WEBSITE);
         websiteTextField.setEditable(false);
     }
 
