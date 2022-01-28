@@ -53,7 +53,7 @@
                            <children>
                               <Label text="遊戲版本" />
                               <TextField fx:id="gameVersionTextField" prefHeight="24.0" prefWidth="183.0" GridPane.columnIndex="1" />
-                              <Button fx:id="gameVersionButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="76.0" text="選擇" GridPane.columnIndex="2" />
+                              <Button fx:id="gameVersionButton" mnemonicParsing="false" onAction="#onGameVersionButton" prefHeight="24.0" prefWidth="76.0" text="選擇" GridPane.columnIndex="2" />
                               <TextField fx:id="installLocatinTextField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                               <Label text="模組版本" GridPane.rowIndex="1" />
                               <GridPane prefWidth="174.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
@@ -66,16 +66,16 @@
                                 </rowConstraints>
                                  <children>
                                     <TextField fx:id="modVersionTextField" prefHeight="24.0" prefWidth="100.0" GridPane.columnIndex="1" />
-                                    <ChoiceBox fx:id="modVersionChoiceBox" prefWidth="150.0" />
+                                    <ChoiceBox fx:id="modVersionChoiceBox" onAction="#onModVersionChoiceBox" prefWidth="150.0" />
                                  </children>
                               </GridPane>
                               <Button fx:id="modVersionButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="76.0" text="選擇" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                               <Label text="安裝位置" GridPane.rowIndex="2" />
                               <Button fx:id="installLocationButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="76.0" text="瀏覽" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                               <Label text="最大記憶體" GridPane.rowIndex="7" />
-                              <Slider fx:id="maxRamSlider" blockIncrement="1.0" max="10240.0" min="128.0" onMouseDragged="#onMaxRamSlider" onMouseReleased="#onMaxRamSlider" value="1024.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                              <Slider fx:id="maxRamSlider" blockIncrement="1.0" max="8192.0" min="128.0" onMouseDragged="#onMaxRamSlider" onMouseReleased="#onMaxRamSlider" value="1024.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                               <Label text="最小記憶體" GridPane.rowIndex="8" />
-                              <Slider fx:id="minRamSlider" blockIncrement="1.0" max="10240.0" min="128.0" onMouseDragged="#onMinRamSlider" onMouseReleased="#onMinRamSlider" value="1024.0" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                              <Slider fx:id="minRamSlider" blockIncrement="1.0" max="8192.0" min="128.0" onMouseDragged="#onMinRamSlider" onMouseReleased="#onMinRamSlider" value="1024.0" GridPane.columnIndex="1" GridPane.rowIndex="8" />
                               <Label text="GUI 介面" GridPane.rowIndex="3" />
                               <CheckBox fx:id="guiCheckBox" mnemonicParsing="false" text="啟用伺服器 GUI 介面" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                               <Label text="EULA" GridPane.rowIndex="4" />

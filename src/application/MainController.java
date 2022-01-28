@@ -62,12 +62,12 @@ public class MainController {
     public void initialize() {
         /** Basic Options */
         gameVersionTextField.setEditable(false);
+        modVersionChoiceBox.getItems().clear();
+        modVersionChoiceBox.getItems().addAll("不使用", "Forge", "Fabric");
         modVersionChoiceBox.getSelectionModel().selectFirst();
         modVersionTextField.setEditable(false);
         modVersionButton.setDisable(true);
         installLocatinTextField.setEditable(false);
-        modVersionChoiceBox.getItems().clear();
-        modVersionChoiceBox.getItems().addAll("不使用", "Forge", "Fabric");
         resetRamOptions();
 
         /** Advanced Options */
@@ -138,6 +138,24 @@ public class MainController {
         resetRamOptions();
     }
 
+    public void onGameVersionButton(ActionEvent event) {
+        if (Information.VersionList.gameVersion.isEmpty()) Information.VersionList.gameVersion = Network.getGameVersion();
+        var vec = Information.VersionList.gameVersion;
+        if (vec.isEmpty()) return;
+        String version = MessageBox.choiceDialog(vec, "遊戲版本", "請選擇 Minecraft 主版本", gameVersionTextField.getText());
+        if (version != null) {
+            gameVersionTextField.setText(version);
+        }
+    }
+
+    public void onModVersionChoiceBox() {
+        if (modVersionChoiceBox.getSelectionModel().getSelectedIndex() == 0) {
+            modVersionButton.setDisable(true);
+            return;
+        }
+        modVersionButton.setDisable(false);
+    }
+
     public void onMaxRamSlider() {
         int newVal = (int)maxRamSlider.getValue();
         int minVal = (int)minRamSlider.getValue();
@@ -151,6 +169,11 @@ public class MainController {
     }
 
     public void onMaxRamTextField(ActionEvent event) {
+        if (!maxRamTextField.getText().matches("^[0-9]+$")) {
+            MessageBox.alertBox(AlertType.INFORMATION, changeRamCheckBox.getText(), "請輸入正整數。");
+            maxRamTextField.setText(String.valueOf((int)maxRamSlider.getValue()));
+            return;
+        }
         int newVal = Integer.parseInt(maxRamTextField.getText());
         int minVal = (int)minRamSlider.getValue();
         if (newVal >= minVal) {
@@ -175,6 +198,11 @@ public class MainController {
     }
 
     public void onMinRamTextField(ActionEvent event) {
+        if (!minRamTextField.getText().matches("^[0-9]+$")) {
+            MessageBox.alertBox(AlertType.INFORMATION, changeRamCheckBox.getText(), "請輸入正整數。");
+            minRamTextField.setText(String.valueOf((int)minRamSlider.getValue()));
+            return;
+        }
         int newVal = Integer.parseInt(minRamTextField.getText());
         int maxVal = (int)maxRamSlider.getValue();
         if (newVal <= maxVal) {
