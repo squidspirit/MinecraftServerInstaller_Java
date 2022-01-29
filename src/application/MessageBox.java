@@ -22,14 +22,14 @@ public class MessageBox {
         alert.showAndWait();
     }
 
-    public static String choiceDialog (Vector<Pair<String, String>> vec, String title, String header, String selected) {
+    public static String choiceDialog (String title, String header, Vector<Pair<String, String>> vec, String selected) {
         final ChoiceDialog<String> dialog = new ChoiceDialog<>();
         dialog.setTitle(title);
         dialog.setHeaderText(header);
         for (var pair : vec) {
             dialog.getItems().add(pair.getKey());
         }
-        if (selected != "") dialog.setSelectedItem(vec.get(0).getKey());
+        if (selected == "") dialog.setSelectedItem(vec.get(0).getKey());
         else dialog.setSelectedItem(selected);
         dialog.showAndWait();
         return dialog.getResult();

@@ -8,10 +8,19 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
+import javafx.util.Pair;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.Vector;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
 public class MainController {
+    Vector<Pair<String, String>> gameVersionList = new Vector<>();
 
     /** Public Items */
     @FXML private Button startInstallButton;
@@ -27,8 +36,8 @@ public class MainController {
     @FXML private ChoiceBox<String> modVersionChoiceBox;
     @FXML private TextField modVersionTextField = new TextField();
     @FXML private Button modVersionButton;
-    @FXML private TextField installLocatinTextField = new TextField();
-    @FXML private Button installLocationButton;
+    @FXML private TextField installPathTextField = new TextField();
+    @FXML private Button installPathButton;
     @FXML private CheckBox changeRamCheckBox;
     @FXML private Slider maxRamSlider;
     @FXML private TextField maxRamTextField = new TextField();
@@ -67,7 +76,7 @@ public class MainController {
         modVersionChoiceBox.getSelectionModel().selectFirst();
         modVersionTextField.setEditable(false);
         modVersionButton.setDisable(true);
-        installLocatinTextField.setEditable(false);
+        installPathTextField.setEditable(false);
         resetRamOptions();
 
         /** Advanced Options */
@@ -84,14 +93,15 @@ public class MainController {
         resetAdnavcedOptions();
 
         /** Information */
-        nameLabel.setText(Information.NAME);
-        versionLabel.setText(Information.VERSION);
-        authorLabel.setText(Information.AUTHOR);
-        emailTextField.setText(Information.EMAIL);
+        statusLabel.setText(Program.Status.READY);
+        nameLabel.setText(Program.Information.NAME);
+        versionLabel.setText(Program.Information.VERSION);
+        authorLabel.setText(Program.Information.AUTHOR);
+        emailTextField.setText(Program.Information.EMAIL);
         emailTextField.setEditable(false);
-        tutorialTextField.setText(Information.TUTORIAL);
+        tutorialTextField.setText(Program.Information.TUTORIAL);
         tutorialTextField.setEditable(false);
-        websiteTextField.setText(Information.WEBSITE);
+        websiteTextField.setText(Program.Information.WEBSITE);
         websiteTextField.setEditable(false);
     }
 
@@ -122,9 +132,100 @@ public class MainController {
     }
 
     /** Actions */
+    public void onStartInstallButton(ActionEvent event) {
+        if (!eulaCheckBox.isSelected()) {
+            MessageBox.alertBox(AlertType.INFORMATION, "提示", "您必須同意 EULA 條款。");
+            return;
+        }
+        if (gameVersionTextField.getText() == "") {
+            MessageBox.alertBox(AlertType.INFORMATION, "提示", "請選擇伺服器遊戲版本。");
+            return;
+        }
+        if (modVersionChoiceBox.getSelectionModel().getSelectedIndex() == 1) {
+            if (modVersionTextField.getText() == "") {
+                MessageBox.alertBox(AlertType.INFORMATION, "提示", "請選擇模組版本，或將其調整為不使用。");
+                return;
+            }
+        }
+
+    }
+
+    public void onGameVersionButton(ActionEvent event) {
+        final String filename = "GameVersion.info";
+        Task<Void> task = new DownloadFile(Program.Url.GAME_VERSION, filename);
+        progressBar.progressProperty().bind(task.progressProperty());
+        statusLabel.textProperty().bind(task.titleProperty());
+        gameVersionButton.disableProperty().bind(task.runningProperty());
+        Thread downloadThread = new Thread(task);
+        downloadThread.setDaemon(true);
+        downloadThread.start();
+
+        task.setOnSucceeded(e -> {
+            String line = new String();
+            String str[] = new String[2];
+            Vector<Pair<String, String>> vec = new Vector<>();
+            try (BufferedReader reader = new BufferedReader(new FileReader(new File(filename)))) {
+                while ((line = reader.readLine()) != null) {
+                    str = line.split(" ");
+                    vec.add(new Pair<>(str[0], str[1]));
+                }
+                gameVersionList = vec;
+            }
+            catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            gameVersionTextField.setText(
+                MessageBox.choiceDialog("選擇版本", "請選擇遊戲主版本", gameVersionList, gameVersionTextField.getText())
+            );
+        });  
+    }
+
+    public void onModVersionButton(ActionEvent event) {
+        if (gameVersionTextField.getText() == "") {
+            MessageBox.alertBox(AlertType.INFORMATION, "提示", "請先選擇伺服器遊戲版本。");
+            return;
+        }
+
+        final String filename = "ForgeVersion.info";
+        Task<Void> task = new DownloadFile(Program.Url.FORGE_VERSION, filename);
+        progressBar.progressProperty().bind(task.progressProperty());
+        statusLabel.textProperty().bind(task.titleProperty());
+        gameVersionButton.disableProperty().bind(task.runningProperty());
+        Thread downloadThread = new Thread(task);
+        downloadThread.setDaemon(true);
+        downloadThread.start();
+
+        task.setOnSucceeded(e -> {
+            String line = new String();
+            String str[] = new String[2];
+            Vector<Pair<String, String>> vec = new Vector<>();
+            try (BufferedReader reader = new BufferedReader(new FileReader(new File(filename)))) {
+                while ((line = reader.readLine()) != null) {
+                    str = line.split(" ");
+                    vec.add(new Pair<>(str[0], str[1]));
+                }
+                gameVersionList = vec;
+            }
+            catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            gameVersionTextField.setText(
+                MessageBox.choiceDialog("選擇版本", "請選擇遊戲主版本", gameVersionList, gameVersionTextField.getText())
+            );
+        });
+    }
+
+    public void onInstallPathButton() {
+        DirectoryChooser chooser = new DirectoryChooser();
+        File directory = chooser.showDialog(new Stage());
+        if (directory != null) {
+            installPathTextField.setText(directory.getPath());
+        }
+    }
+
     public void onChangeRamCheckBox(ActionEvent event) {
         if (changeRamCheckBox.isSelected()) {
-            MessageBox.alertBox(AlertType.INFORMATION, changeRamCheckBox.getText(), "更改伺服器記憶體限制可能會影響伺服器的穩定性，或甚至無法正常啟動，請小心調整。");
+            MessageBox.alertBox(AlertType.WARNING, changeRamCheckBox.getText(), "更改伺服器記憶體限制可能會影響伺服器的穩定性，或甚至無法正常啟動，請小心調整。");
             maxRamSlider.setDisable(false);
             maxRamTextField.setDisable(false);
             minRamSlider.setDisable(false);
@@ -138,22 +239,13 @@ public class MainController {
         resetRamOptions();
     }
 
-    public void onGameVersionButton(ActionEvent event) {
-        if (Information.VersionList.gameVersion.isEmpty()) Information.VersionList.gameVersion = Network.getGameVersion();
-        var vec = Information.VersionList.gameVersion;
-        if (vec.isEmpty()) return;
-        String version = MessageBox.choiceDialog(vec, "遊戲版本", "請選擇 Minecraft 主版本", gameVersionTextField.getText());
-        if (version != null) {
-            gameVersionTextField.setText(version);
-        }
-    }
-
     public void onModVersionChoiceBox() {
-        if (modVersionChoiceBox.getSelectionModel().getSelectedIndex() == 0) {
-            modVersionButton.setDisable(true);
+        if (modVersionChoiceBox.getSelectionModel().getSelectedIndex() == 1) {
+            modVersionButton.setDisable(false);
             return;
         }
-        modVersionButton.setDisable(false);
+        modVersionTextField.setText("");
+        modVersionButton.setDisable(true);
     }
 
     public void onMaxRamSlider() {

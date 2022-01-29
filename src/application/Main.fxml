@@ -54,7 +54,7 @@
                               <Label text="遊戲版本" />
                               <TextField fx:id="gameVersionTextField" prefHeight="24.0" prefWidth="183.0" GridPane.columnIndex="1" />
                               <Button fx:id="gameVersionButton" mnemonicParsing="false" onAction="#onGameVersionButton" prefHeight="24.0" prefWidth="76.0" text="選擇" GridPane.columnIndex="2" />
-                              <TextField fx:id="installLocatinTextField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <TextField fx:id="installPathTextField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                               <Label text="模組版本" GridPane.rowIndex="1" />
                               <GridPane prefWidth="174.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                 <columnConstraints>
@@ -69,9 +69,9 @@
                                     <ChoiceBox fx:id="modVersionChoiceBox" onAction="#onModVersionChoiceBox" prefWidth="150.0" />
                                  </children>
                               </GridPane>
-                              <Button fx:id="modVersionButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="76.0" text="選擇" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                              <Button fx:id="modVersionButton" mnemonicParsing="false" onAction="#onModVersionButton" prefHeight="24.0" prefWidth="76.0" text="選擇" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                               <Label text="安裝位置" GridPane.rowIndex="2" />
-                              <Button fx:id="installLocationButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="76.0" text="瀏覽" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                              <Button fx:id="installPathButton" mnemonicParsing="false" onAction="#onInstallPathButton" prefHeight="24.0" prefWidth="76.0" text="瀏覽" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                               <Label text="最大記憶體" GridPane.rowIndex="7" />
                               <Slider fx:id="maxRamSlider" blockIncrement="1.0" max="8192.0" min="128.0" onMouseDragged="#onMaxRamSlider" onMouseReleased="#onMaxRamSlider" value="1024.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                               <Label text="最小記憶體" GridPane.rowIndex="8" />
@@ -79,8 +79,8 @@
                               <Label text="GUI 介面" GridPane.rowIndex="3" />
                               <CheckBox fx:id="guiCheckBox" mnemonicParsing="false" text="啟用伺服器 GUI 介面" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                               <Label text="EULA" GridPane.rowIndex="4" />
-                              <CheckBox fx:id="eulaCheckBox" mnemonicParsing="false" text="我同意 EULA 條款" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                              <Button fx:id="startInstallButton" mnemonicParsing="false" prefHeight="40.0" prefWidth="76.0" text="開始安裝" GridPane.columnIndex="2" GridPane.rowIndex="11" />
+                              <CheckBox fx:id="eulaCheckBox" mnemonicParsing="false" text="我同意 Minecraft EULA 條款" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                              <Button fx:id="startInstallButton" mnemonicParsing="false" onAction="#onStartInstallButton" prefHeight="40.0" prefWidth="76.0" text="開始安裝" GridPane.columnIndex="2" GridPane.rowIndex="11" />
                               <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="11">
                                  <children>
                                     <Button fx:id="ramResetButton" layoutX="81.0" layoutY="10.0" mnemonicParsing="false" onAction="#onResetRamButton" prefHeight="40.0" prefWidth="105.0" text="重置記憶體設定">
@@ -265,12 +265,23 @@
       <Separator prefWidth="200.0" />
       <HBox alignment="CENTER_RIGHT" prefHeight="60.0" prefWidth="400.0" spacing="15.0">
          <children>
-            <ProgressBar fx:id="progressBar" prefHeight="17.0" prefWidth="105.0" progress="0.0" />
-            <Label fx:id="statusLabel" text="狀態：已就緒" textAlignment="RIGHT">
-               <font>
-                  <Font size="12.0" />
-               </font>
-            </Label>
+            <GridPane prefHeight="34.0" prefWidth="194.0">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="141.0" minWidth="10.0" prefWidth="118.0" />
+                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="113.0" minWidth="10.0" prefWidth="76.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <ProgressBar fx:id="progressBar" prefHeight="17.0" prefWidth="107.0" progress="0.0" />
+                  <Label fx:id="statusLabel" text="已就緒" GridPane.columnIndex="1">
+                     <font>
+                        <Font size="12.0" />
+                     </font>
+                  </Label>
+               </children>
+            </GridPane>
          </children>
          <padding>
             <Insets bottom="5.0" right="20.0" />
