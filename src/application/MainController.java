@@ -210,7 +210,7 @@ public class MainController {
                 ex.printStackTrace();
             }
             gameVersionTextField.setText(
-                MessageBox.choiceDialog("選擇版本", "請選擇遊戲主版本", gameVersionList, gameVersionTextField.getText())
+                MessageBox.choiceDialog("選擇版本", "請選 Forge 版本", gameVersionList, gameVersionTextField.getText())
             );
         });
     }
