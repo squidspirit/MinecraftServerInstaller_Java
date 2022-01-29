@@ -58,14 +58,14 @@
                               <Label text="模組版本" GridPane.rowIndex="1" />
                               <GridPane prefWidth="174.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                 <columnConstraints>
-                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="108.66667175292969" minWidth="10.0" prefWidth="85.33334350585938" />
-                                  <ColumnConstraints fillWidth="false" halignment="RIGHT" hgrow="SOMETIMES" maxWidth="117.66667175292969" minWidth="10.0" prefWidth="102.66665649414062" />
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="108.66667175292969" minWidth="10.0" prefWidth="82.0" />
+                                  <ColumnConstraints fillWidth="false" halignment="RIGHT" hgrow="SOMETIMES" maxWidth="126.0" minWidth="10.0" prefWidth="112.0" />
                                 </columnConstraints>
                                 <rowConstraints>
                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                 </rowConstraints>
                                  <children>
-                                    <TextField fx:id="modVersionTextField" prefHeight="24.0" prefWidth="100.0" GridPane.columnIndex="1" />
+                                    <TextField fx:id="modVersionTextField" prefHeight="24.0" prefWidth="108.0" GridPane.columnIndex="1" />
                                     <ChoiceBox fx:id="modVersionChoiceBox" onAction="#onModVersionChoiceBox" prefWidth="150.0" />
                                  </children>
                               </GridPane>
@@ -79,7 +79,7 @@
                               <Label text="GUI 介面" GridPane.rowIndex="3" />
                               <CheckBox fx:id="guiCheckBox" mnemonicParsing="false" text="啟用伺服器 GUI 介面" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                               <Label text="EULA" GridPane.rowIndex="4" />
-                              <CheckBox fx:id="eulaCheckBox" mnemonicParsing="false" text="我同意 Minecraft EULA 條款" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                              <CheckBox fx:id="eulaCheckBox" mnemonicParsing="false" text="我同意 EULA 條款" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                               <Button fx:id="startInstallButton" mnemonicParsing="false" onAction="#onStartInstallButton" prefHeight="40.0" prefWidth="76.0" text="開始安裝" GridPane.columnIndex="2" GridPane.rowIndex="11" />
                               <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="11">
                                  <children>
@@ -192,7 +192,7 @@
                               <ChoiceBox fx:id="commandBolckChoiceBox" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                               <ChoiceBox fx:id="onlineModeChoiceBox" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="8" />
                               <TextField fx:id="motdTextField" maxHeight="24.0" maxWidth="200.0" minHeight="24.0" minWidth="200.0" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="9" />
-                              <Button fx:id="optionResetButton" mnemonicParsing="false" prefHeight="40.0" prefWidth="76.0" text="重置選項" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+                              <Button fx:id="optionResetButton" mnemonicParsing="false" onAction="#onOptionResetButton" prefHeight="40.0" prefWidth="76.0" text="重置選項" GridPane.columnIndex="1" GridPane.rowIndex="11" />
                               <TextField fx:id="portTextField" maxHeight="24.0" maxWidth="200.0" minHeight="24.0" minWidth="200.0" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" />
                               <TextField fx:id="maxPlayerTextField" maxHeight="24.0" maxWidth="200.0" minHeight="24.0" minWidth="200.0" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                               <TextField fx:id="spawnProtectionTextField" maxHeight="24.0" maxWidth="200.0" minHeight="24.0" minWidth="200.0" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
@@ -265,23 +265,12 @@
       <Separator prefWidth="200.0" />
       <HBox alignment="CENTER_RIGHT" prefHeight="60.0" prefWidth="400.0" spacing="15.0">
          <children>
-            <GridPane prefHeight="34.0" prefWidth="194.0">
-              <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="141.0" minWidth="10.0" prefWidth="118.0" />
-                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="113.0" minWidth="10.0" prefWidth="76.0" />
-              </columnConstraints>
-              <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-              </rowConstraints>
-               <children>
-                  <ProgressBar fx:id="progressBar" prefHeight="17.0" prefWidth="107.0" progress="0.0" />
-                  <Label fx:id="statusLabel" text="已就緒" GridPane.columnIndex="1">
-                     <font>
-                        <Font size="12.0" />
-                     </font>
-                  </Label>
-               </children>
-            </GridPane>
+            <ProgressBar fx:id="progressBar" prefHeight="17.0" prefWidth="105.0" progress="0.0" />
+            <Label fx:id="statusLabel" text="狀態：已就緒" textAlignment="RIGHT">
+               <font>
+                  <Font size="12.0" />
+               </font>
+            </Label>
          </children>
          <padding>
             <Insets bottom="5.0" right="20.0" />

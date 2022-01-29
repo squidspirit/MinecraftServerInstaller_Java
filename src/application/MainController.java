@@ -10,17 +10,21 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
-import javafx.util.Pair;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
 public class MainController {
-    Vector<Pair<String, String>> gameVersionList = new Vector<>();
+    private Vector<String> gameVersionVector = new Vector<>();
+    private Map<String, String> gameVersionMap = new HashMap<>();
+    private Vector<String> forgeVersionVector = new Vector<>();
+    private Map<String, String> forgeVersionMap = new HashMap<>();
 
     /** Public Items */
     @FXML private Button startInstallButton;
@@ -155,7 +159,6 @@ public class MainController {
         Task<Void> task = new DownloadFile(Program.Url.GAME_VERSION, filename);
         progressBar.progressProperty().bind(task.progressProperty());
         statusLabel.textProperty().bind(task.titleProperty());
-        gameVersionButton.disableProperty().bind(task.runningProperty());
         Thread downloadThread = new Thread(task);
         downloadThread.setDaemon(true);
         downloadThread.start();
@@ -163,21 +166,32 @@ public class MainController {
         task.setOnSucceeded(e -> {
             String line = new String();
             String str[] = new String[2];
-            Vector<Pair<String, String>> vec = new Vector<>();
+            gameVersionVector.clear();
+            gameVersionMap.clear();
             try (BufferedReader reader = new BufferedReader(new FileReader(new File(filename)))) {
                 while ((line = reader.readLine()) != null) {
                     str = line.split(" ");
-                    vec.add(new Pair<>(str[0], str[1]));
+                    gameVersionVector.add(str[0]);
+                    gameVersionMap.put(str[0], str[1]);
                 }
-                gameVersionList = vec;
             }
             catch (Exception ex) {
                 ex.printStackTrace();
             }
             gameVersionTextField.setText(
-                MessageBox.choiceDialog("選擇版本", "請選擇遊戲主版本", gameVersionList, gameVersionTextField.getText())
+                MessageBox.choiceDialog("選擇版本", "請選擇遊戲主版本", gameVersionVector, gameVersionTextField.getText())
             );
-        });  
+        });
+    }
+
+    public void onModVersionChoiceBox() {
+        if (modVersionChoiceBox.getSelectionModel().getSelectedIndex() == 1) {
+            modVersionButton.setDisable(false);
+        }
+        else {
+            modVersionTextField.setText("");
+            modVersionButton.setDisable(true);
+        }
     }
 
     public void onModVersionButton(ActionEvent event) {
@@ -186,31 +200,35 @@ public class MainController {
             return;
         }
 
+        final String gameVersion = gameVersionTextField.getText();
         final String filename = "ForgeVersion.info";
         Task<Void> task = new DownloadFile(Program.Url.FORGE_VERSION, filename);
         progressBar.progressProperty().bind(task.progressProperty());
         statusLabel.textProperty().bind(task.titleProperty());
-        gameVersionButton.disableProperty().bind(task.runningProperty());
         Thread downloadThread = new Thread(task);
         downloadThread.setDaemon(true);
         downloadThread.start();
 
         task.setOnSucceeded(e -> {
             String line = new String();
-            String str[] = new String[2];
-            Vector<Pair<String, String>> vec = new Vector<>();
+            String str[] = new String[4];
+            forgeVersionVector.clear();
+            forgeVersionMap.clear();
             try (BufferedReader reader = new BufferedReader(new FileReader(new File(filename)))) {
                 while ((line = reader.readLine()) != null) {
                     str = line.split(" ");
-                    vec.add(new Pair<>(str[0], str[1]));
+                    if (gameVersion.equals(str[0])) {
+                        forgeVersionVector.add(str[2]);
+                    }
                 }
-                gameVersionList = vec;
             }
             catch (Exception ex) {
                 ex.printStackTrace();
             }
-            gameVersionTextField.setText(
-                MessageBox.choiceDialog("選擇版本", "請選 Forge 版本", gameVersionList, gameVersionTextField.getText())
+            if (forgeVersionVector.isEmpty())
+                MessageBox.alertBox(AlertType.INFORMATION, "提示", "沒有 " + gameVersion + " 這個版本的 Forge 伺服器。");
+            else modVersionTextField.setText(
+                MessageBox.choiceDialog("選擇版本", "請選 Forge 版本", forgeVersionVector, modVersionTextField.getText())
             );
         });
     }
@@ -237,15 +255,6 @@ public class MainController {
 
     public void onResetRamButton(ActionEvent event) {
         resetRamOptions();
-    }
-
-    public void onModVersionChoiceBox() {
-        if (modVersionChoiceBox.getSelectionModel().getSelectedIndex() == 1) {
-            modVersionButton.setDisable(false);
-            return;
-        }
-        modVersionTextField.setText("");
-        modVersionButton.setDisable(true);
     }
 
     public void onMaxRamSlider() {
@@ -304,5 +313,9 @@ public class MainController {
         MessageBox.alertBox(AlertType.INFORMATION, changeRamCheckBox.getText(), "最大記憶體限制必須大於最小限制。");
         minRamSlider.setValue(maxVal);
         minRamTextField.setText(String.valueOf(maxVal));
+    }
+
+    public void onOptionResetButton() {
+        resetAdnavcedOptions();
     }
 }
