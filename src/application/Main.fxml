@@ -21,7 +21,7 @@
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MainController">
    <children>
-      <TabPane prefHeight="580.0" prefWidth="400.0" tabClosingPolicy="UNAVAILABLE">
+      <TabPane fx:id="mainTabPane" prefHeight="580.0" prefWidth="400.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
           <Tab text="基本設定">
                <content>

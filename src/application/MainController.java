@@ -6,6 +6,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.DirectoryChooser;
@@ -27,6 +28,7 @@ public class MainController {
     private Map<String, String> forgeVersionMap = new HashMap<>();
 
     /** Public Items */
+    @FXML private TabPane mainTabPane;
     @FXML private Button startInstallButton;
     @FXML private Button ramResetButton;
     @FXML private Button optionResetButton;
@@ -159,6 +161,7 @@ public class MainController {
         Task<Void> task = new DownloadFile(Program.Url.GAME_VERSION, filename);
         progressBar.progressProperty().bind(task.progressProperty());
         statusLabel.textProperty().bind(task.titleProperty());
+        mainTabPane.disableProperty().bind(task.runningProperty());
         Thread downloadThread = new Thread(task);
         downloadThread.setDaemon(true);
         downloadThread.start();
@@ -178,9 +181,14 @@ public class MainController {
             catch (Exception ex) {
                 ex.printStackTrace();
             }
-            gameVersionTextField.setText(
-                MessageBox.choiceDialog("選擇版本", "請選擇遊戲主版本", gameVersionVector, gameVersionTextField.getText())
-            );
+            final String newVersion = MessageBox.choiceDialog("選擇版本", "請選擇遊戲主版本", gameVersionVector, gameVersionTextField.getText());
+            if (!newVersion.equals(gameVersionTextField.getText())) modVersionTextField.setText("");
+            gameVersionTextField.setText(newVersion);
+            mainTabPane.disableProperty().unbind();
+        });
+
+        task.setOnFailed(e -> {
+            mainTabPane.disableProperty().unbind();
         });
     }
 
@@ -205,13 +213,14 @@ public class MainController {
         Task<Void> task = new DownloadFile(Program.Url.FORGE_VERSION, filename);
         progressBar.progressProperty().bind(task.progressProperty());
         statusLabel.textProperty().bind(task.titleProperty());
+        mainTabPane.disableProperty().bind(task.runningProperty());
         Thread downloadThread = new Thread(task);
         downloadThread.setDaemon(true);
         downloadThread.start();
 
         task.setOnSucceeded(e -> {
             String line = new String();
-            String str[] = new String[4];
+            String str[] = new String[3];
             forgeVersionVector.clear();
             forgeVersionMap.clear();
             try (BufferedReader reader = new BufferedReader(new FileReader(new File(filename)))) {
@@ -219,6 +228,7 @@ public class MainController {
                     str = line.split(" ");
                     if (gameVersion.equals(str[0])) {
                         forgeVersionVector.add(str[2]);
+                        forgeVersionMap.put(str[2], "https://maven.minecraftforge.net/net/minecraftforge/forge/" + str[2] + "/forge-" + str[2] + "-installer.jar");
                     }
                 }
             }
@@ -230,6 +240,11 @@ public class MainController {
             else modVersionTextField.setText(
                 MessageBox.choiceDialog("選擇版本", "請選 Forge 版本", forgeVersionVector, modVersionTextField.getText())
             );
+            mainTabPane.disableProperty().unbind();
+        });
+
+        task.setOnFailed(e -> {
+            mainTabPane.disableProperty().unbind();
         });
     }
 
