@@ -134,7 +134,7 @@
                               </VBox>
                               <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0" GridPane.rowIndex="1">
                                  <children>
-                                    <Label text="max-player" />
+                                    <Label text="max-players" />
                                     <Label text="玩家上限" />
                                  </children>
                               </VBox>
@@ -186,17 +186,17 @@
                                     <Label text="最大視野距離" />
                                  </children>
                               </VBox>
-                              <ChoiceBox fx:id="pvpChoiceBox" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                              <ChoiceBox fx:id="gamemodeChoiceBox" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                              <ChoiceBox fx:id="difficultyChoiceBox" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                              <ChoiceBox fx:id="commandBolckChoiceBox" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-                              <ChoiceBox fx:id="onlineModeChoiceBox" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-                              <TextField fx:id="motdTextField" maxHeight="24.0" maxWidth="200.0" minHeight="24.0" minWidth="200.0" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+                              <ChoiceBox fx:id="pvpChoiceBox" onAction="#onPvpChoiceBox" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                              <ChoiceBox fx:id="gamemodeChoiceBox" onAction="#onGamemodeChoiceBox" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                              <ChoiceBox fx:id="difficultyChoiceBox" onAction="#onDifficultyChoiceBox" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                              <ChoiceBox fx:id="commandBolckChoiceBox" onAction="#onCommandBlockChoiceBox" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                              <ChoiceBox fx:id="onlineModeChoiceBox" onAction="#onOnlineModeChoiceBox" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                              <TextField fx:id="motdTextField" maxHeight="24.0" maxWidth="200.0" minHeight="24.0" minWidth="200.0" onAction="#onMotdTextField" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="9" />
                               <Button fx:id="optionResetButton" mnemonicParsing="false" onAction="#onOptionResetButton" prefHeight="40.0" prefWidth="76.0" text="重置選項" GridPane.columnIndex="1" GridPane.rowIndex="11" />
-                              <TextField fx:id="portTextField" maxHeight="24.0" maxWidth="200.0" minHeight="24.0" minWidth="200.0" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" />
-                              <TextField fx:id="maxPlayerTextField" maxHeight="24.0" maxWidth="200.0" minHeight="24.0" minWidth="200.0" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                              <TextField fx:id="spawnProtectionTextField" maxHeight="24.0" maxWidth="200.0" minHeight="24.0" minWidth="200.0" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                              <TextField fx:id="viewDistanceTextField" maxHeight="24.0" maxWidth="200.0" minHeight="24.0" minWidth="200.0" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              <TextField fx:id="portTextField" maxHeight="24.0" maxWidth="200.0" minHeight="24.0" minWidth="200.0" onAction="#onPortTextField" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" />
+                              <TextField fx:id="maxPlayerTextField" maxHeight="24.0" maxWidth="200.0" minHeight="24.0" minWidth="200.0" onAction="#onMaxPlayerTextField" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <TextField fx:id="spawnProtectionTextField" maxHeight="24.0" maxWidth="200.0" minHeight="24.0" minWidth="200.0" onAction="#onSpawnProtectionTextField" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <TextField fx:id="viewDistanceTextField" maxHeight="24.0" maxWidth="200.0" minHeight="24.0" minWidth="200.0" onAction="#onViewDistanceTextField" prefHeight="24.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                            </children>
                         </GridPane>
                      </children>

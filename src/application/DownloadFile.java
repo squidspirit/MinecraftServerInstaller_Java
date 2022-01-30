@@ -12,15 +12,17 @@ import javafx.scene.control.Alert.AlertType;
 public class DownloadFile extends Task<Void> {
     private String url;
     private String filename;
+    private String status;
 
-    public DownloadFile(String url, String filename) {
+    public DownloadFile(String url, String filename, String status) {
         this.url = url;
         this.filename = filename;
+        this.status = status;
     }
 
     @Override
     protected Void call() throws Exception {
-        updateTitle(Program.Status.PROCESSING);
+        updateTitle(this.status);
         URLConnection connection = new URL(url).openConnection();
         long fileLength = connection.getContentLengthLong();
         

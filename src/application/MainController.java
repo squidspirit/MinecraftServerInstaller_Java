@@ -22,10 +22,13 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
 public class MainController {
-    private Vector<String> gameVersionVector = new Vector<>();
-    private Map<String, String> gameVersionMap = new HashMap<>();
-    private Vector<String> forgeVersionVector = new Vector<>();
-    private Map<String, String> forgeVersionMap = new HashMap<>();
+    final private Vector<String> gameVersionVector = new Vector<>();
+    final private Map<String, String> gameVersionMap = new HashMap<>();
+    final private Vector<String> forgeVersionVector = new Vector<>();
+    final private Map<String, String> forgeVersionMap = new HashMap<>();
+    final private Map<String, String> serverProperties = new HashMap<>();
+    private int maxRamValue;
+    private int minRamValue;
 
     /** Public Items */
     @FXML private TabPane mainTabPane;
@@ -80,6 +83,7 @@ public class MainController {
         modVersionChoiceBox.getItems().clear();
         modVersionChoiceBox.getItems().addAll("不使用", "Forge", "Fabric");
         modVersionChoiceBox.getSelectionModel().selectFirst();
+        modVersionChoiceBox.setDisable(true);
         modVersionTextField.setEditable(false);
         modVersionButton.setDisable(true);
         installPathTextField.setEditable(false);
@@ -109,15 +113,41 @@ public class MainController {
         tutorialTextField.setEditable(false);
         websiteTextField.setText(Program.Information.WEBSITE);
         websiteTextField.setEditable(false);
+
+        /** Listeners */
+        maxRamTextField.focusedProperty().addListener((ov, oldV, newV) -> {
+            if (!newV) onMaxRamTextField(new ActionEvent());
+        });
+        minRamTextField.focusedProperty().addListener((ov, oldV, newV) -> {
+            if (!newV) onMinRamTextField(new ActionEvent());
+        });
+        portTextField.focusedProperty().addListener((ov, oldV, newV) -> {
+            if (!newV) onPortTextField(new ActionEvent());
+        });
+        maxPlayerTextField.focusedProperty().addListener((ov, oldV, newV) -> {
+            if (!newV) onMaxPlayerTextField(new ActionEvent());
+        });
+        spawnProtectionTextField.focusedProperty().addListener((ov, oldV, newV) -> {
+            if (!newV) onSpawnProtectionTextField(new ActionEvent());
+        });
+        viewDistanceTextField.focusedProperty().addListener((ov, oldV, newV) -> {
+            if (!newV) onViewDistanceTextField(new ActionEvent());
+        });
+        motdTextField.focusedProperty().addListener((ov, oldV, newV) -> {
+            if (!newV) onMotdTextField(new ActionEvent());
+        });
     }
 
-    public void resetRamOptions() {
+    /** Functions */
+    private void resetRamOptions() {
         changeRamCheckBox.setDisable(false);
         changeRamCheckBox.setSelected(false);
+        maxRamValue = 1024;
         maxRamSlider.setValue(1024);
         maxRamSlider.setDisable(true);
         maxRamTextField.setText("1024");
         maxRamTextField.setDisable(true);
+        minRamValue = 1024;
         minRamSlider.setValue(1024);
         minRamSlider.setDisable(true);
         minRamTextField.setText("1024");
@@ -125,7 +155,19 @@ public class MainController {
         ramResetButton.setDisable(true);
     }
 
-    public void resetAdnavcedOptions() {
+    private void resetAdnavcedOptions() {
+        serverProperties.clear();
+        serverProperties.put(Program.Options.SERVER_PORT, "25565");
+        serverProperties.put(Program.Options.MAX_PLAYERS, "20");
+        serverProperties.put(Program.Options.SPAWN_PROTECTION, "16");
+        serverProperties.put(Program.Options.VIEW_DISTANCE, "10");
+        serverProperties.put(Program.Options.PVP, "true");
+        serverProperties.put(Program.Options.GAMEMODE, "0");
+        serverProperties.put(Program.Options.DIFFICULTY, "2");
+        serverProperties.put(Program.Options.ENABLE_COMMAND_BLOCK, "false");
+        serverProperties.put(Program.Options.ONLINE_MODE, "true");
+        serverProperties.put(Program.Options.MOTD, "");
+
         portTextField.setText("25565");
         maxPlayerTextField.setText("20");
         spawnProtectionTextField.setText("16");
@@ -135,36 +177,94 @@ public class MainController {
         difficultyChoiceBox.getSelectionModel().select(2);
         commandBolckChoiceBox.getSelectionModel().selectLast();
         onlineModeChoiceBox.getSelectionModel().selectFirst();
+        motdTextField.setText("");
+    }
+
+    private boolean fixTextField(TextField textField, String replace) {
+        final String str = textField.getText();
+        if (!str.matches("^[0-9]+$") || str.equals("")) {
+            MessageBox.alertBox(AlertType.INFORMATION, "提示", "請輸入正整數。");
+            textField.setText(replace);
+            return true;
+        }
+        return false;
     }
 
     /** Actions */
     public void onStartInstallButton(ActionEvent event) {
+        /** Check Errors */
         if (!eulaCheckBox.isSelected()) {
             MessageBox.alertBox(AlertType.INFORMATION, "提示", "您必須同意 EULA 條款。");
             return;
         }
-        if (gameVersionTextField.getText() == "") {
+        if (gameVersionTextField.getText().equals("")) {
             MessageBox.alertBox(AlertType.INFORMATION, "提示", "請選擇伺服器遊戲版本。");
             return;
         }
         if (modVersionChoiceBox.getSelectionModel().getSelectedIndex() == 1) {
-            if (modVersionTextField.getText() == "") {
+            if (modVersionTextField.getText().equals("")) {
                 MessageBox.alertBox(AlertType.INFORMATION, "提示", "請選擇模組版本，或將其調整為不使用。");
                 return;
             }
         }
+        if (installPathTextField.getText().equals("")) {
+            MessageBox.alertBox(AlertType.INFORMATION, "提示", "請選擇伺服器安裝位置。");
+            return;
+        }
 
+        /** Download Main Server File */
+        // 0 -> None, 1 -> Forge, 2 -> Fabric
+        final int modTypeValue = modVersionChoiceBox.getSelectionModel().getSelectedIndex();
+        final String gameVersionValue = gameVersionTextField.getText();
+        final String installPathValue = installPathTextField.getText() + "/";
+        switch (modTypeValue) {
+            case 0: // None
+                Task<Void> task = new DownloadFile(gameVersionMap.get(gameVersionValue), installPathValue + "server.jar", Program.Status.DOWNLOADING);
+                progressBar.progressProperty().bind(task.progressProperty());
+                statusLabel.textProperty().bind(task.titleProperty());
+                mainTabPane.disableProperty().bind(task.runningProperty());
+                Thread thread = new Thread(task);
+                thread.setDaemon(true);
+                thread.start();
+
+                task.setOnSucceeded(e -> {
+                    try (CreateFile createFile = new CreateFile(installPathValue)) {
+                        createFile.setEnableGui(guiCheckBox.isSelected());
+                        createFile.setProperties(serverProperties);
+                        createFile.setRam(maxRamValue, minRamValue);
+                        createFile.build();
+                    }
+                    catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                    MessageBox.alertBox(AlertType.INFORMATION, "安裝完成", "Minecraft 伺服器已安裝至您所選擇的位置，請至該處執行 StartServer.bat/StartServer.sh。");
+                    mainTabPane.disableProperty().unbind();
+                });
+
+                task.setOnFailed(e -> {
+                    mainTabPane.disableProperty().unbind();
+                });
+
+                break;
+            case 1: // Forge
+                
+                break;
+            case 2: // Fabric
+
+                break;
+            default: break;
+        }
     }
 
     public void onGameVersionButton(ActionEvent event) {
         final String filename = "GameVersion.info";
-        Task<Void> task = new DownloadFile(Program.Url.GAME_VERSION, filename);
+        final Task<Void> task = new DownloadFile(Program.Url.GAME_VERSION, filename, Program.Status.PROCESSING);
         progressBar.progressProperty().bind(task.progressProperty());
         statusLabel.textProperty().bind(task.titleProperty());
         mainTabPane.disableProperty().bind(task.runningProperty());
-        Thread downloadThread = new Thread(task);
-        downloadThread.setDaemon(true);
-        downloadThread.start();
+        final Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
 
         task.setOnSucceeded(e -> {
             String line = new String();
@@ -182,7 +282,11 @@ public class MainController {
                 ex.printStackTrace();
             }
             final String newVersion = MessageBox.choiceDialog("選擇版本", "請選擇遊戲主版本", gameVersionVector, gameVersionTextField.getText());
-            if (!newVersion.equals(gameVersionTextField.getText())) modVersionTextField.setText("");
+            if (!newVersion.equals(gameVersionTextField.getText())) {
+                modVersionTextField.setText("");
+                modVersionChoiceBox.getSelectionModel().selectFirst();
+            }
+            modVersionChoiceBox.setDisable(newVersion.equals(""));
             gameVersionTextField.setText(newVersion);
             mainTabPane.disableProperty().unbind();
         });
@@ -203,20 +307,20 @@ public class MainController {
     }
 
     public void onModVersionButton(ActionEvent event) {
-        if (gameVersionTextField.getText() == "") {
+        if (gameVersionTextField.getText().equals("")) {
             MessageBox.alertBox(AlertType.INFORMATION, "提示", "請先選擇伺服器遊戲版本。");
             return;
         }
 
         final String gameVersion = gameVersionTextField.getText();
         final String filename = "ForgeVersion.info";
-        Task<Void> task = new DownloadFile(Program.Url.FORGE_VERSION, filename);
+        final Task<Void> task = new DownloadFile(Program.Url.FORGE_VERSION, filename, Program.Status.PROCESSING);
         progressBar.progressProperty().bind(task.progressProperty());
         statusLabel.textProperty().bind(task.titleProperty());
         mainTabPane.disableProperty().bind(task.runningProperty());
-        Thread downloadThread = new Thread(task);
-        downloadThread.setDaemon(true);
-        downloadThread.start();
+        final Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
 
         task.setOnSucceeded(e -> {
             String line = new String();
@@ -249,16 +353,26 @@ public class MainController {
     }
 
     public void onInstallPathButton() {
+        mainTabPane.setDisable(true);
         DirectoryChooser chooser = new DirectoryChooser();
         File directory = chooser.showDialog(new Stage());
-        if (directory != null) {
-            installPathTextField.setText(directory.getPath());
+        if (directory == null) {
+            mainTabPane.setDisable(false);
+            return;
         }
+        if (directory.list().length > 0) {
+            if (!MessageBox.confirmationDialog("提示", "安裝伺服器的位置建議為空資料夾，您所選取的資料夾不為空，確定仍然要選擇此資料夾嗎？")) {
+                mainTabPane.setDisable(false);
+                return;
+            }
+        }
+        installPathTextField.setText(directory.getPath());
+        mainTabPane.setDisable(false);
     }
 
     public void onChangeRamCheckBox(ActionEvent event) {
         if (changeRamCheckBox.isSelected()) {
-            MessageBox.alertBox(AlertType.WARNING, changeRamCheckBox.getText(), "更改伺服器記憶體限制可能會影響伺服器的穩定性，或甚至無法正常啟動，請小心調整。");
+            MessageBox.alertBox(AlertType.WARNING, "警告", "更改伺服器記憶體限制可能會影響伺服器的穩定性，或甚至無法正常啟動，請小心調整。");
             maxRamSlider.setDisable(false);
             maxRamTextField.setDisable(false);
             minRamSlider.setDisable(false);
@@ -273,64 +387,124 @@ public class MainController {
     }
 
     public void onMaxRamSlider() {
-        int newVal = (int)maxRamSlider.getValue();
-        int minVal = (int)minRamSlider.getValue();
-        if (newVal >= minVal) {
-            maxRamTextField.setText(String.valueOf(newVal));
+        final int newVal = (int)maxRamSlider.getValue();
+        if (newVal < minRamValue) {
+            MessageBox.alertBox(AlertType.INFORMATION, changeRamCheckBox.getText(), "最大記憶體限制必須大於等於最小限制。");
+            maxRamSlider.setValue(minRamValue);
+            maxRamTextField.setText(String.valueOf(minRamValue));
             return;
         }
-        MessageBox.alertBox(AlertType.INFORMATION, changeRamCheckBox.getText(), "最大記憶體限制必須大於最小限制。");
-        maxRamSlider.setValue(minVal);
-        maxRamTextField.setText(String.valueOf(minVal));
+        maxRamTextField.setText(String.valueOf(newVal));
+        maxRamValue = newVal;
     }
 
     public void onMaxRamTextField(ActionEvent event) {
-        if (!maxRamTextField.getText().matches("^[0-9]+$")) {
-            MessageBox.alertBox(AlertType.INFORMATION, changeRamCheckBox.getText(), "請輸入正整數。");
-            maxRamTextField.setText(String.valueOf((int)maxRamSlider.getValue()));
+        if (fixTextField(maxRamTextField, String.valueOf((int)maxRamSlider.getValue())))
+            return;
+        final int newVal = Integer.parseInt(maxRamTextField.getText());
+        if (newVal < minRamValue) {
+            MessageBox.alertBox(AlertType.INFORMATION, changeRamCheckBox.getText(), "最大記憶體限制必須大於等於最小限制。");
+            maxRamSlider.setValue(minRamValue);
+            maxRamTextField.setText(String.valueOf(minRamValue));
             return;
         }
-        int newVal = Integer.parseInt(maxRamTextField.getText());
-        int minVal = (int)minRamSlider.getValue();
-        if (newVal >= minVal) {
-            maxRamSlider.setValue(newVal);
-            return;
-        }
-        MessageBox.alertBox(AlertType.INFORMATION, changeRamCheckBox.getText(), "最大記憶體限制必須大於最小限制。");
-        maxRamSlider.setValue(minVal);
-        maxRamTextField.setText(String.valueOf(minVal));
+        maxRamSlider.setValue(newVal);
+        maxRamValue = newVal;
     }
 
     public void onMinRamSlider() {
-        int newVal = (int)minRamSlider.getValue();
-        int maxVal = (int)maxRamSlider.getValue();
-        if (newVal <= maxVal) {
-            minRamTextField.setText(String.valueOf(newVal));
+        final int newVal = (int)minRamSlider.getValue();
+        if (newVal > maxRamValue) {
+            MessageBox.alertBox(AlertType.INFORMATION, changeRamCheckBox.getText(), "最大記憶體限制必須大於最小限制。");
+            minRamSlider.setValue(maxRamValue);
+            minRamTextField.setText(String.valueOf(maxRamValue));
             return;
         }
-        MessageBox.alertBox(AlertType.INFORMATION, changeRamCheckBox.getText(), "最大記憶體限制必須大於最小限制。");
-        minRamSlider.setValue(maxVal);
-        minRamTextField.setText(String.valueOf(maxVal));
+        minRamTextField.setText(String.valueOf(newVal));
+        minRamValue = newVal;
     }
 
     public void onMinRamTextField(ActionEvent event) {
-        if (!minRamTextField.getText().matches("^[0-9]+$")) {
-            MessageBox.alertBox(AlertType.INFORMATION, changeRamCheckBox.getText(), "請輸入正整數。");
-            minRamTextField.setText(String.valueOf((int)minRamSlider.getValue()));
+        if (fixTextField(minRamTextField, String.valueOf((int)minRamSlider.getValue())))
+            return;
+        final int newVal = Integer.parseInt(minRamTextField.getText());
+        if (newVal > maxRamValue) {
+            MessageBox.alertBox(AlertType.INFORMATION, changeRamCheckBox.getText(), "最大記憶體限制必須大於最小限制。");
+            minRamSlider.setValue(maxRamValue);
+            minRamTextField.setText(String.valueOf(maxRamValue));
             return;
         }
-        int newVal = Integer.parseInt(minRamTextField.getText());
-        int maxVal = (int)maxRamSlider.getValue();
-        if (newVal <= maxVal) {
-            minRamSlider.setValue(newVal);
-            return;
-        }
-        MessageBox.alertBox(AlertType.INFORMATION, changeRamCheckBox.getText(), "最大記憶體限制必須大於最小限制。");
-        minRamSlider.setValue(maxVal);
-        minRamTextField.setText(String.valueOf(maxVal));
+        minRamSlider.setValue(newVal);
+        minRamValue = newVal;
     }
 
     public void onOptionResetButton() {
         resetAdnavcedOptions();
+    }
+
+    public void onPortTextField(ActionEvent event) {
+        if (fixTextField(portTextField, serverProperties.get(Program.Options.SERVER_PORT)))
+            return;
+        final int newVal = Integer.parseInt(portTextField.getText());
+        if (newVal < 1025 || newVal > 65535) {
+            MessageBox.alertBox(AlertType.INFORMATION, "提示", "請輸入 1025 ~ 65535 內的值。");
+            portTextField.setText(serverProperties.get(Program.Options.SERVER_PORT));
+            return;
+        }
+        MessageBox.alertBox(AlertType.WARNING, "警告", "更改伺服器連接埠可能與其他應用程式產生衝突，造成無法連線或系統不穩定，請確認設置的連接埠是否為空連接埠，並為其設置防火牆通道允許通過。");
+        serverProperties.put(Program.Options.SERVER_PORT, String.valueOf(newVal));
+    }
+
+    public void onMaxPlayerTextField(ActionEvent event) {
+        if (fixTextField(maxPlayerTextField, serverProperties.get(Program.Options.MAX_PLAYERS)))
+            return;
+        final int newVal = Integer.parseInt(maxPlayerTextField.getText());
+        if (newVal < 1) {
+            MessageBox.alertBox(AlertType.INFORMATION, "提示", "請輸入正整數。");
+            maxPlayerTextField.setText(serverProperties.get(Program.Options.MAX_PLAYERS));
+            return;
+        }
+        serverProperties.put(Program.Options.MAX_PLAYERS, String.valueOf(newVal));
+    }
+
+    public void onSpawnProtectionTextField(ActionEvent event) {
+        if (fixTextField(spawnProtectionTextField, serverProperties.get(Program.Options.SPAWN_PROTECTION)))
+            return;
+        serverProperties.put(Program.Options.SPAWN_PROTECTION, spawnProtectionTextField.getText());
+    }
+
+    public void onViewDistanceTextField(ActionEvent event) {
+        if (fixTextField(viewDistanceTextField, serverProperties.get(Program.Options.VIEW_DISTANCE)))
+            return;
+        serverProperties.put(Program.Options.VIEW_DISTANCE, viewDistanceTextField.getText());
+    }
+
+    public void onPvpChoiceBox(ActionEvent event) {
+        serverProperties.put(Program.Options.PVP,
+            String.valueOf(pvpChoiceBox.getSelectionModel().getSelectedIndex()));
+    }
+
+    public void onGamemodeChoiceBox(ActionEvent event) {
+        serverProperties.put(Program.Options.GAMEMODE,
+            String.valueOf(gamemodeChoiceBox.getSelectionModel().getSelectedIndex()));
+    }
+
+    public void onDifficultyChoiceBox(ActionEvent event) {
+        serverProperties.put(Program.Options.DIFFICULTY,
+            String.valueOf(difficultyChoiceBox.getSelectionModel().getSelectedIndex()));
+    }
+
+    public void onCommandBlockChoiceBox(ActionEvent event) {
+        serverProperties.put(Program.Options.ENABLE_COMMAND_BLOCK,
+            commandBolckChoiceBox.getSelectionModel().getSelectedIndex() == 0 ? "true" : "false");
+    }
+
+    public void onOnlineModeChoiceBox(ActionEvent event) {
+        serverProperties.put(Program.Options.ONLINE_MODE,
+            onlineModeChoiceBox.getSelectionModel().getSelectedIndex() == 0 ? "true" : "false");
+    }
+
+    public void onMotdTextField(ActionEvent event) {
+        serverProperties.put(Program.Options.MOTD, motdTextField.getText());
     }
 }

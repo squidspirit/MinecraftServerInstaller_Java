@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
     public static void main(String[] args) {
-        launch(args);
+        if (args.length == 0) launch();
     }
 
     @Override
