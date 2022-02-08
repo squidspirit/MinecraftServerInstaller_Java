@@ -49,6 +49,7 @@ public class DownloadFile extends Task<Void> {
 
     @Override
     protected void succeeded() {
+        updateProgress(1, 1);
         updateTitle(Program.Status.READY);
     }
 }

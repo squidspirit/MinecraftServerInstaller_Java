@@ -14,6 +14,7 @@ import javafx.stage.Stage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -22,6 +23,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
 public class MainController {
+    final private boolean isWindows = System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
     final private Vector<String> gameVersionVector = new Vector<>();
     final private Map<String, String> gameVersionMap = new HashMap<>();
     final private Vector<String> forgeVersionVector = new Vector<>();
@@ -190,6 +192,43 @@ public class MainController {
         return false;
     }
 
+    private void createRunFile(String path, String filename, int maxRam, int minRam, boolean isGui) {
+        final File file = new File(path + "StartServer" + (isWindows ? ".bat" : ".sh"));
+        file.setExecutable(true);
+        try (FileWriter writer = new FileWriter(file)) {
+            if (!isWindows) writer.write("#!/bin/sh\n");
+            writer.write("java -Xmx" + maxRam+ "M -Xms" + minRam + "M ");
+            if (filename.indexOf(".jar") >= 0) writer.write("-jar ");
+            writer.write(filename);
+            if (!isGui) writer.write(" nogui");
+            writer.write("\n");
+            if (isWindows) writer.write("pause\n");
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+        
+    private void createPropertiesFile(String path, Map<String, String> propertiesMap) {
+        try (FileWriter writer = new FileWriter(new File(path + "server.properties"))) {
+            for (var obj : propertiesMap.entrySet()) {
+                writer.write(obj.getKey() + "=" + obj.getValue() + "\n");
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createEulaFile(String path) {
+        try (FileWriter writer = new FileWriter(new File(path + "eula.txt"))) {
+            writer.write("eula=true\n");
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     /** Actions */
     public void onStartInstallButton(ActionEvent event) {
         /** Check Errors */
@@ -214,30 +253,28 @@ public class MainController {
 
         /** Download Main Server File */
         // 0 -> None, 1 -> Forge, 2 -> Fabric
+        Task<Void> task;
+        Thread thread;
         final int modTypeValue = modVersionChoiceBox.getSelectionModel().getSelectedIndex();
-        final String gameVersionValue = gameVersionTextField.getText();
         final String installPathValue = installPathTextField.getText() + "/";
         switch (modTypeValue) {
             case 0: // None
-                Task<Void> task = new DownloadFile(gameVersionMap.get(gameVersionValue), installPathValue + "server.jar", Program.Status.DOWNLOADING);
+                final String gameVersionValue = gameVersionTextField.getText();
+                task = new DownloadFile(gameVersionMap.get(gameVersionValue), installPathValue + "server.jar", Program.Status.DOWNLOADING);
                 progressBar.progressProperty().bind(task.progressProperty());
                 statusLabel.textProperty().bind(task.titleProperty());
                 mainTabPane.disableProperty().bind(task.runningProperty());
-                Thread thread = new Thread(task);
+                thread = new Thread(task);
                 thread.setDaemon(true);
                 thread.start();
 
                 task.setOnSucceeded(e -> {
-                    try (CreateFile createFile = new CreateFile(installPathValue)) {
-                        createFile.setEnableGui(guiCheckBox.isSelected());
-                        createFile.setProperties(serverProperties);
-                        createFile.setRam(maxRamValue, minRamValue);
-                        createFile.build();
-                    }
-                    catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                    MessageBox.alertBox(AlertType.INFORMATION, "安裝完成", "Minecraft 伺服器已安裝至您所選擇的位置，請至該處執行 StartServer.bat/StartServer.sh。");
+                    final File runFile = new File(installPathValue + "install" + (isWindows ? ".bat" : ".sh"));
+                    runFile.setExecutable(true);
+                    createRunFile(installPathValue, "server.jar", maxRamValue, minRamValue, guiCheckBox.isSelected());
+                    createEulaFile(installPathValue);
+                    createPropertiesFile(installPathValue, serverProperties);
+                    MessageBox.alertBox(AlertType.INFORMATION, "安裝完成", "Minecraft 伺服器已安裝至您所選擇的位置，請至該處執行 StartServer.bat 或 StartServer.sh。");
                     mainTabPane.disableProperty().unbind();
                 });
 
@@ -247,7 +284,55 @@ public class MainController {
 
                 break;
             case 1: // Forge
-                
+                final String forgeVersionValue = modVersionTextField.getText();
+                task = new DownloadFile(forgeVersionMap.get(forgeVersionValue), installPathValue + "forge-installer.jar", Program.Status.DOWNLOADING);
+                progressBar.progressProperty().bind(task.progressProperty());
+                statusLabel.textProperty().bind(task.titleProperty());
+                mainTabPane.disableProperty().bind(task.runningProperty());
+                thread = new Thread(task);
+                thread.setDaemon(true);
+                thread.start();
+
+                task.setOnSucceeded(e -> {
+                    final Task<Void> installTask = new InstallForge(installPathValue);
+                    progressBar.progressProperty().bind(installTask.progressProperty());
+                    statusLabel.textProperty().bind(installTask.titleProperty());
+                    mainTabPane.disableProperty().bind(installTask.runningProperty());
+                    Thread installThread = new Thread(installTask);
+                    installThread.setDaemon(true);
+                    installThread.start();
+
+                    installTask.setOnSucceeded(ie -> {
+                        createEulaFile(installPathValue);
+                        createPropertiesFile(installPathValue, serverProperties);
+                        if (Integer.parseInt(forgeVersionValue.split("\\.")[1]) >= 17) {
+                            final String argsFile = "@libraries/net/minecraftforge/forge/" + forgeVersionValue + (isWindows ? "/win" : "/unix") + "_args.txt";
+                            createRunFile(installPathValue, argsFile, maxRamValue, minRamValue, guiCheckBox.isSelected());
+                        }
+                        else {
+                            try {
+                                Process process = Runtime.getRuntime().exec((isWindows ? "mv" : "move") + " *.jar server.jar", null, new File(installPathValue));
+                                process.waitFor();
+                            }
+                            catch (Exception exception) {
+                                exception.printStackTrace();
+                            }
+                            createRunFile(installPathValue, "server.jar", maxRamValue, minRamValue, guiCheckBox.isSelected());
+                        }
+                        progressBar.progressProperty().unbind();
+                        progressBar.setProgress(1);
+                        MessageBox.alertBox(AlertType.INFORMATION, "安裝完成", "Minecraft 伺服器已安裝至您所選擇的位置，請至該處執行 StartServer.bat 或 StartServer.sh。");
+                        mainTabPane.disableProperty().unbind();
+                    });
+
+                    installTask.setOnFailed(ie -> {
+                        mainTabPane.disableProperty().unbind();
+                    });
+                });
+
+                task.setOnFailed(e -> {
+                    mainTabPane.disableProperty().unbind();
+                });
                 break;
             case 2: // Fabric
 
@@ -481,7 +566,7 @@ public class MainController {
 
     public void onPvpChoiceBox(ActionEvent event) {
         serverProperties.put(Program.Options.PVP,
-            String.valueOf(pvpChoiceBox.getSelectionModel().getSelectedIndex()));
+            commandBolckChoiceBox.getSelectionModel().getSelectedIndex() == 0 ? "true" : "false");
     }
 
     public void onGamemodeChoiceBox(ActionEvent event) {
