@@ -1,5 +1,11 @@
 package application;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.attribute.PosixFilePermission;
+import java.util.HashSet;
+import java.util.Set;
+
 public final class Program {
     public final class Information {
         public static final String NAME = "Minecraft Server Installer";
@@ -34,5 +40,18 @@ public final class Program {
         public static final String ENABLE_COMMAND_BLOCK = "enable-command-block";
         public static final String ONLINE_MODE = "online-mode";
         public static final String MOTD = "motd";
-    } 
+    }
+
+    public static void setExecutable(File file) throws Exception {
+        Set<PosixFilePermission> perms = new HashSet<>();
+        perms.add(PosixFilePermission.OWNER_READ);
+        perms.add(PosixFilePermission.OWNER_WRITE);
+        perms.add(PosixFilePermission.OWNER_EXECUTE);
+        perms.add(PosixFilePermission.GROUP_READ);
+        perms.add(PosixFilePermission.GROUP_WRITE);
+        perms.add(PosixFilePermission.GROUP_EXECUTE);
+        perms.add(PosixFilePermission.OTHERS_READ);
+        perms.add(PosixFilePermission.OTHERS_EXECUTE);
+        Files.setPosixFilePermissions(file.toPath(), perms);
+    }
 }

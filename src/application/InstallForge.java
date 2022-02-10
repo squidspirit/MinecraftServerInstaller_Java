@@ -21,7 +21,6 @@ public class InstallForge extends Task<Void> {
         updateTitle(Program.Status.PROCESSING);
         Process process;
         File file = new File(path + "install" + (isWindows ? ".bat" : ".sh"));
-        file.setExecutable(true);
         try (FileWriter writer = new FileWriter(file)) {
             if (!isWindows) writer.write("#!/bin/sh\n");
             writer.write("java -jar ");
@@ -29,6 +28,7 @@ public class InstallForge extends Task<Void> {
             writer.write("forge-installer.jar --installServer\n");
             writer.write((isWindows ? "del " : "rm ./") + "forge-installer.jar\n");
             writer.write(isWindows ? "del install.bat\n" : "rm ./install.sh\n");
+            Program.setExecutable(file);
         }
         process = Runtime.getRuntime().exec(isWindows ? "cmd /C install.bat" : "/bin/sh -c ./install.sh", null, new File(path));
         InputStreamReader isr = new InputStreamReader(process.getInputStream());

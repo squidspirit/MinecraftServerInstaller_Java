@@ -196,7 +196,6 @@ public class MainController {
 
     private void createRunFile(String path, String filename, int maxRam, int minRam, boolean isGui) {
         final File file = new File(path + "StartServer" + (isWindows ? ".bat" : ".sh"));
-        file.setExecutable(true);
         try (FileWriter writer = new FileWriter(file)) {
             if (!isWindows) writer.write("#!/bin/sh\n");
             writer.write("java -Xmx" + maxRam+ "M -Xms" + minRam + "M ");
@@ -205,6 +204,7 @@ public class MainController {
             if (!isGui) writer.write(" nogui");
             writer.write("\n");
             if (isWindows) writer.write("pause\n");
+            if (!isWindows) Program.setExecutable(file);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -284,10 +284,6 @@ public class MainController {
 
                 break;
             case 1: // Forge
-                if (forgeVersionMap.isEmpty()) {
-                    MessageBox.alertBox(AlertType.INFORMATION, "提示", "沒有 " + gameVersionValue + " 版本的 Forge，請選擇其他版本。");
-                    break;
-                }
                 final String forgeVersionValue = modVersionTextField.getText();
                 task = new DownloadFile(forgeVersionMap.get(forgeVersionValue), installPathValue + "forge-installer.jar", Program.Status.DOWNLOADING);
                 progressBar.progressProperty().bind(task.progressProperty());
@@ -418,7 +414,7 @@ public class MainController {
                 modVersionChoiceBox.getSelectionModel().selectFirst();
             }
             modVersionChoiceBox.setDisable(newVersion.equals(""));
-            gameVersionTextField.setText(newVersion);
+            if (!newVersion.equals("")) gameVersionTextField.setText(newVersion);
             mainTabPane.disableProperty().unbind();
         });
 
@@ -435,7 +431,8 @@ public class MainController {
             modVersionTextField.setText("");
             modVersionButton.setDisable(true);
         }
-        if (Integer.parseInt(gameVersionTextField.getText().split("\\.")[1]) < 14) {
+        if (modVersionChoiceBox.getSelectionModel().getSelectedIndex() == 2 &&
+                Integer.parseInt(gameVersionTextField.getText().split("\\.")[1]) < 14) {
             MessageBox.alertBox(AlertType.INFORMATION, "提示", "Fabric 僅支援 1.14 或以上的版本。");
             modVersionChoiceBox.getSelectionModel().selectFirst();
         }
@@ -475,7 +472,7 @@ public class MainController {
                 ex.printStackTrace();
             }
             if (forgeVersionVector.isEmpty())
-                MessageBox.alertBox(AlertType.INFORMATION, "提示", "沒有 " + gameVersion + " 這個版本的 Forge 伺服器。");
+                MessageBox.alertBox(AlertType.INFORMATION, "提示", "沒有 " + gameVersion + " 版本的 Forge，請選擇其他版本。");
             else modVersionTextField.setText(
                 MessageBox.choiceDialog("選擇版本", "請選 Forge 版本", forgeVersionVector, modVersionTextField.getText())
             );
