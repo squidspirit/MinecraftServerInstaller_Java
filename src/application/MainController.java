@@ -15,6 +15,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -257,9 +259,9 @@ public class MainController {
         Thread thread;
         final int modTypeValue = modVersionChoiceBox.getSelectionModel().getSelectedIndex();
         final String installPathValue = installPathTextField.getText() + "/";
+        final String gameVersionValue = gameVersionTextField.getText();
         switch (modTypeValue) {
             case 0: // None
-                final String gameVersionValue = gameVersionTextField.getText();
                 task = new DownloadFile(gameVersionMap.get(gameVersionValue), installPathValue + "server.jar", Program.Status.DOWNLOADING);
                 progressBar.progressProperty().bind(task.progressProperty());
                 statusLabel.textProperty().bind(task.titleProperty());
@@ -269,8 +271,6 @@ public class MainController {
                 thread.start();
 
                 task.setOnSucceeded(e -> {
-                    final File runFile = new File(installPathValue + "install" + (isWindows ? ".bat" : ".sh"));
-                    runFile.setExecutable(true);
                     createRunFile(installPathValue, "server.jar", maxRamValue, minRamValue, guiCheckBox.isSelected());
                     createEulaFile(installPathValue);
                     createPropertiesFile(installPathValue, serverProperties);
@@ -298,7 +298,7 @@ public class MainController {
                     progressBar.progressProperty().bind(installTask.progressProperty());
                     statusLabel.textProperty().bind(installTask.titleProperty());
                     mainTabPane.disableProperty().bind(installTask.runningProperty());
-                    Thread installThread = new Thread(installTask);
+                    final Thread installThread = new Thread(installTask);
                     installThread.setDaemon(true);
                     installThread.start();
 
@@ -335,7 +335,49 @@ public class MainController {
                 });
                 break;
             case 2: // Fabric
+                String fabricVersionValue;
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(Program.Url.FABRIC_VERSION).openStream()))) {
+                    fabricVersionValue = reader.readLine();
+                }
+                catch (Exception exception) {
+                    MessageBox.alertBox(AlertType.ERROR, "錯誤", "請檢常網路設備是否連接正常");
+                    exception.printStackTrace();
+                    break;
+                }
+                final String fabricInstallerUrl = "https://maven.fabricmc.net/net/fabricmc/fabric-installer/" + fabricVersionValue + "/fabric-installer-" + fabricVersionValue + ".jar";
+                task = new DownloadFile(fabricInstallerUrl, installPathValue + "fabric-installer.jar", Program.Status.DOWNLOADING);
+                progressBar.progressProperty().bind(task.progressProperty());
+                statusLabel.textProperty().bind(task.titleProperty());
+                mainTabPane.disableProperty().bind(task.runningProperty());
+                thread = new Thread(task);
+                thread.setDaemon(true);
+                thread.start();
 
+                task.setOnSucceeded(e -> {
+                    final Task<Void> installTask = new InstallFabric(installPathValue, gameVersionValue);
+                    progressBar.progressProperty().bind(installTask.progressProperty());
+                    statusLabel.textProperty().bind(installTask.titleProperty());
+                    mainTabPane.disableProperty().bind(installTask.runningProperty());
+                    final Thread installThread = new Thread(installTask);
+                    installThread.setDaemon(true);
+                    installThread.start();
+
+                    installTask.setOnSucceeded(ie -> {
+                        createRunFile(installPathValue, "fabric-server-launch.jar", maxRamValue, minRamValue, guiCheckBox.isSelected());
+                        createEulaFile(installPathValue);
+                        createPropertiesFile(installPathValue, serverProperties);
+                        MessageBox.alertBox(AlertType.INFORMATION, "安裝完成", "Minecraft 伺服器已安裝至您所選擇的位置，請至該處執行 StartServer.bat 或 StartServer.sh。");
+                        mainTabPane.disableProperty().unbind();
+                    });
+
+                    installTask.setOnFailed(ie -> {
+                        mainTabPane.disableProperty().unbind();
+                    });
+                });
+
+                task.setOnFailed(e -> {
+                    mainTabPane.disableProperty().unbind();
+                });
                 break;
             default: break;
         }

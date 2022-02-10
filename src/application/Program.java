@@ -20,6 +20,7 @@ public final class Program {
     public final class Url {
         public static final String GAME_VERSION = "https://www.dropbox.com/s/mtz3moc9dpjtz7s/GameVersions.txt?dl=1";
         public static final String FORGE_VERSION = "https://www.dropbox.com/s/0ioc3d0m6lfitlr/ForgeVersions.txt?dl=1";
+        public static final String FABRIC_VERSION = "https://www.dropbox.com/s/p5le9abdiwx10wi/FabricInstallerVersion.txt?dl=1";
     }
 
     public final class Options{
