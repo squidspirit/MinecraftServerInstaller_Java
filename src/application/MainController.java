@@ -284,6 +284,10 @@ public class MainController {
 
                 break;
             case 1: // Forge
+                if (forgeVersionMap.isEmpty()) {
+                    MessageBox.alertBox(AlertType.INFORMATION, "提示", "沒有 " + gameVersionValue + " 版本的 Forge，請選擇其他版本。");
+                    break;
+                }
                 final String forgeVersionValue = modVersionTextField.getText();
                 task = new DownloadFile(forgeVersionMap.get(forgeVersionValue), installPathValue + "forge-installer.jar", Program.Status.DOWNLOADING);
                 progressBar.progressProperty().bind(task.progressProperty());
@@ -424,12 +428,16 @@ public class MainController {
     }
 
     public void onModVersionChoiceBox() {
-        if (modVersionChoiceBox.getSelectionModel().getSelectedIndex() == 1) {
+        if (modVersionChoiceBox.getSelectionModel().getSelectedIndex() == 1) { // Forge
             modVersionButton.setDisable(false);
         }
         else {
             modVersionTextField.setText("");
             modVersionButton.setDisable(true);
+        }
+        if (Integer.parseInt(gameVersionTextField.getText().split("\\.")[1]) < 14) {
+            MessageBox.alertBox(AlertType.INFORMATION, "提示", "Fabric 僅支援 1.14 或以上的版本。");
+            modVersionChoiceBox.getSelectionModel().selectFirst();
         }
     }
 
