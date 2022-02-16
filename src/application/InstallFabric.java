@@ -29,7 +29,7 @@ public class InstallFabric extends Task<Void> {
             writer.write("fabric-installer.jar server -downloadMinecraft -mcversion " + version + "\n");
             writer.write((isWindows ? "del " : "rm ./") + "fabric-installer.jar\n");
             writer.write(isWindows ? "del install.bat\n" : "rm ./install.sh\n");
-            Program.setExecutable(file);
+            if (!isWindows) Program.setExecutable(file);
         }
         process = Runtime.getRuntime().exec(isWindows ? "cmd /C install.bat" : "/bin/sh -c ./install.sh", null, new File(path));
         InputStreamReader isr = new InputStreamReader(process.getInputStream());
